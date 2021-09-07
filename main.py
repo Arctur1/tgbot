@@ -1,4 +1,3 @@
-
 import database as db
 from settings import ALLOWED_USERS, TOKEN
 import logging
@@ -8,15 +7,16 @@ from telegram.ext import Updater, CommandHandler, CallbackContext
 # Enable logging
 logging.basicConfig(
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s', level=logging.INFO
-)
+    )
 
 logger = logging.getLogger(__name__)
 
 
 def start(update: Update, context: CallbackContext) -> None:
-    if update.effective_user.id in ALLOWED_USERS:
+    user = update.effective_user.id
+    if user in ALLOWED_USERS:
         context.job_queue.run_repeating(callback_minute, interval=10, first=1,
-                                    context=update.message.chat_id)
+                                        context={"chat": update.message.chat_id, "user": user})
 
 
 def stop(update: Update, context: CallbackContext) -> None:
@@ -24,8 +24,9 @@ def stop(update: Update, context: CallbackContext) -> None:
 
 
 def callback_minute(context):
-    message = db.find_posts()
-    context.bot.send_message(chat_id=context.job.context,
+    message = db.find_posts(context.job.context["user"])
+    db.time_stamp(context.job.context["user"])
+    context.bot.send_message(chat_id=context.job.context["chat"],
                              text=message)
 
 
@@ -40,7 +41,6 @@ def show(update: Update, context: CallbackContext):
 
 
 def main() -> None:
-
     updater = Updater(TOKEN)
 
     dispatcher = updater.dispatcher

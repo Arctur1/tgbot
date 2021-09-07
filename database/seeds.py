@@ -1,11 +1,11 @@
 import datetime
 from random import randrange
-from mongo import collection
+from mongo import collection, time_stamp, user_collection
 
 post_test = [{"author": "TestUser",
               "text": "Test post!",
               "tags": ["mongodb", "python", "pymongo"],
-              "timestamp": datetime.datetime.utcnow() - datetime.timedelta(minutes=randrange(10))} for i in range(10)]
+              "timestamp": datetime.datetime.utcnow()} for i in range(2)]
 
 
 def seed():

@@ -1,3 +1,3 @@
-__all__ = ["find_posts", "count"]
+__all__ = ["find_posts", "count", "time_stamp"]
 
-from database.mongo import find_posts, count
+from database.mongo import find_posts, count, time_stamp
