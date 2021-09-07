@@ -12,7 +12,7 @@ def count():
     return res
 
 
-def find_posts(user):
+def find_posts(user):  # Finds posts created after latest user look-up
     user = list(user_collection.find({"user": user}))
     if len(user) == 1:
         user_time_stamp = user[0]["timestamp"]
@@ -27,5 +27,5 @@ def find_posts(user):
     return str(res)
 
 
-def time_stamp(user):
+def time_stamp(user): # Updates latest user look-up
     user_collection.update({"user": user}, {"user": user, "timestamp": datetime.datetime.utcnow()}, upsert=True)
