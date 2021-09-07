@@ -4,3 +4,7 @@
 
 ```database.seed``` - seed with data
 
+pip install -r requirements.txt
+
+python main.py
+
