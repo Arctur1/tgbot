@@ -3,6 +3,8 @@ from settings import ALLOWED_USERS, TOKEN
 import logging
 from telegram import Update
 from telegram.ext import Updater, CommandHandler, CallbackContext
+from time import time, sleep
+import asyncio
 
 # Enable logging
 logging.basicConfig(
@@ -36,11 +38,24 @@ def help_command(update: Update, context: CallbackContext) -> None:
 
 def show(update: Update, context: CallbackContext):
     if update.effective_user.id in ALLOWED_USERS:
-        message = db.count()
+        message = db.show_stats()
         update.message.reply_text(message)
 
 
-def main() -> None:
+async def update_stats_async():
+    db.update_stats()
+
+
+async def update_stats_every_x_seconds(timeout, job):
+    while True:
+        await asyncio.gather(
+            asyncio.sleep(timeout),
+            job(),
+        )
+
+
+def main():
+    db.update_stats()
     updater = Updater(TOKEN)
 
     dispatcher = updater.dispatcher
@@ -51,8 +66,11 @@ def main() -> None:
     dispatcher.add_handler(CommandHandler("show", show))
 
     updater.start_polling()
-
+    stats_updater = asyncio.run(update_stats_every_x_seconds(300, update_stats_async))
     updater.idle()
+
+
+
 
 
 if __name__ == '__main__':

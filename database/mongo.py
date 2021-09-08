@@ -1,10 +1,23 @@
 import pymongo
 import datetime
+from settings import *
+import asyncio
 
-client = pymongo.MongoClient('localhost', 27017)
-db = client['TelegramPost']
+client = pymongo.MongoClient(ADDRESS, PORT)
+db = client[DB]
 collection = db['test']
 user_collection = db['users']
+stats_collection = db['collections_stats']
+
+
+def update_stats():
+    count = collection.find().count()
+    stats_collection.update_one({'collection': 'test'}, {'$set': {'collection': 'test', 'count': count}}, upsert=True)
+
+
+def show_stats():
+    stats = list(stats_collection.find({'collection': 'test'}))[0]['count']
+    return stats
 
 
 def count():
